@@ -19,20 +19,25 @@ public class ennemyBasic : MonoBehaviour
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		timerMove = 0f;
-		StartCoroutine(Mouvement());
+		
 	}
 
 	// Update is called once per frame
 	void Update()
     {
-		
+		if(isMoving == false && GameManager.singleton.getPlayerTurn() == false)
+		{
+			Debug.Log("Start coroutine");
+			timerMove = 0f;
+			StartCoroutine(Mouvement());
+		}
 	}
 
 	IEnumerator Mouvement()
 	{
 		Debug.Log("Se déplace");
 		isMoving = true;
-
+		navMeshAgent.isStopped = false;
 		navMeshAgent.speed = 3;
 
 		//Me déplacer vers la destination
@@ -56,6 +61,7 @@ public class ennemyBasic : MonoBehaviour
 		}
 
 		//Je démarre une nouvelle patrouille
+		GameManager.singleton.changeTurn();
 		isMoving = false;
 	}
 }
