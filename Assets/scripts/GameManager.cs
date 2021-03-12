@@ -23,7 +23,13 @@ public class GameManager : MonoBehaviour
 		singleton = this;
 	}
 
-	public void changeTurn()
+    private void Start()
+    {
+		timerJoueur = tempsTourJoueur;
+    }
+
+
+    public void changeTurn()
 	{
 		if(isPlayerTurn == true)
 		{
@@ -31,7 +37,7 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
-			timerJoueur = 0f;
+			timerJoueur = tempsTourJoueur;
 			isPlayerTurn = true;
 		}
 	}
@@ -45,7 +51,12 @@ public class GameManager : MonoBehaviour
     {
         if (isPlayerTurn)
         {
-			timerJoueur += Time.deltaTime;
+			timerJoueur -= Time.deltaTime;
+
+			if(timerJoueur <= 0f)
+            {
+				changeTurn();
+            }
         }
     }
 
