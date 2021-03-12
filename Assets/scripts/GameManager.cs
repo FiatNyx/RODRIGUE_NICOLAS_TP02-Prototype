@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
 
 	public static GameManager singleton;
+
+	float timerJoueur = 0f;
 	bool isPlayerTurn = true;
+	public float tempsTourJoueur = 5f;
 
 	private void Awake()
 	{
@@ -28,6 +31,7 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
+			timerJoueur = 0f;
 			isPlayerTurn = true;
 		}
 	}
@@ -36,4 +40,17 @@ public class GameManager : MonoBehaviour
 	{
 		return isPlayerTurn;
 	}
+
+    public void Update()
+    {
+        if (isPlayerTurn)
+        {
+			timerJoueur += Time.deltaTime;
+        }
+    }
+
+	public float getTimerJoueur()
+    {
+		return timerJoueur;
+    }
 }
