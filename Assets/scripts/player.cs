@@ -7,6 +7,8 @@ public class player : MonoBehaviour
 {
 	Camera mainCam;
 	NavMeshAgent navMeshAgent;
+	int moveSelected = 0;
+	public ParticleSystem particles;
 
 	// Start is called before the first frame update
 	void Start()
@@ -23,30 +25,62 @@ public class player : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if (Input.GetMouseButtonDown(0) && GameManager.singleton.getPlayerTurn())
+		if (GameManager.singleton.getPlayerTurn())
 		{
-			//Créer un rayon entre la caméra et le curseur.
-			Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
-
-			RaycastHit hit;
-			//Y a-t-il eu un impact
-			if (Physics.Raycast(camRay, out hit))
-			{
-				//Demander au pnj de s'y rendre
-				navMeshAgent.SetDestination(hit.point);
-			 
-			}
-		}
 
 		
+			if (Input.GetMouseButtonDown(0))
+			{
+				if (moveSelected == 0)
+				{
+					//Créer un rayon entre la caméra et le curseur.
+					Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
 
-		if(GameManager.singleton.getTimerJoueur() <= 0f)
-        {
-			navMeshAgent.isStopped = true;
-			navMeshAgent.ResetPath();
-			navMeshAgent.isStopped = false;
+					RaycastHit hit;
+					//Y a-t-il eu un impact
+					if (Physics.Raycast(camRay, out hit))
+					{
+						//Demander au pnj de s'y rendre
+						navMeshAgent.SetDestination(hit.point);
+
+					}
+				}else if(moveSelected == 1)
+				{
+					Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
+
+					RaycastHit hit;
+					//Y a-t-il eu un impact
+					if (Physics.Raycast(camRay, out hit))
+					{
+						//Demander au pnj de s'y rendre
+						particles.transform.position = hit.point;
+						particles.Play();
+
+					}
+				}
+
+			
+			
+			}
+
+			if(Input.GetMouseButtonDown(1))
+			{
+				moveSelected = 0;
+			}
+
+			if (Input.GetKeyDown(KeyCode.Alpha1))
+			{
+				moveSelected = 1;
+			}
+		
+
+			if(GameManager.singleton.getTimerJoueur() <= 0f)
+			{
+				navMeshAgent.isStopped = true;
+				navMeshAgent.ResetPath();
+				navMeshAgent.isStopped = false;
+			}
+
 		}
-
-
 	}
 }

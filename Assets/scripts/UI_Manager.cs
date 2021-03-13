@@ -41,8 +41,15 @@ public class UI_Manager : MonoBehaviour
 
     }
 
-    public void changeTurnText()
+    public void changeTurnText(bool isTurnJoueur)
     {
-        //Changer le texte du tour
+		if(isTurnJoueur)
+		{
+			textTour.text = "Tour du joueur";
+		}
+		else
+		{
+			textTour.text = "Tour des ennemis";
+		}
     }
 }

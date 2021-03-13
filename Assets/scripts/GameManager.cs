@@ -34,11 +34,13 @@ public class GameManager : MonoBehaviour
 		if(isPlayerTurn == true)
 		{
 			isPlayerTurn = false;
+			UI_Manager.singleton.changeTurnText(false);
 		}
 		else
 		{
 			timerJoueur = tempsTourJoueur;
 			isPlayerTurn = true;
+			UI_Manager.singleton.changeTurnText(true);
 		}
 	}
 
