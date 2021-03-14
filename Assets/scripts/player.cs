@@ -44,8 +44,9 @@ public class player : MonoBehaviour
 						navMeshAgent.SetDestination(hit.point);
 
 					}
-				}else if(moveSelected == 1)
+				}else if(moveSelected == 1 && GameManager.singleton.getTimerJoueur() > 2)
 				{
+					GameManager.singleton.StartAttack(2);
 					Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
 
 					RaycastHit hit;
@@ -57,6 +58,8 @@ public class player : MonoBehaviour
 						particles.Play();
 
 					}
+					GameManager.singleton.FinishAttack();
+					moveSelected = 0;
 				}
 
 			
@@ -74,7 +77,7 @@ public class player : MonoBehaviour
 			}
 		
 
-			if(GameManager.singleton.getTimerJoueur() <= 0f)
+			if(GameManager.singleton.getTimerJoueur() <= 0.1f)
 			{
 				navMeshAgent.isStopped = true;
 				navMeshAgent.ResetPath();

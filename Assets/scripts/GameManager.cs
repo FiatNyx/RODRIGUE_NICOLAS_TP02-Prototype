@@ -10,6 +10,8 @@ public class GameManager : MonoBehaviour
 	float timerJoueur = 0f;
 	bool isPlayerTurn = true;
 	public float tempsTourJoueur = 5f;
+	bool isTimerStopped = false;
+
 
 	private void Awake()
 	{
@@ -49,9 +51,20 @@ public class GameManager : MonoBehaviour
 		return isPlayerTurn;
 	}
 
+	public void StartAttack(float cost)
+	{
+		isTimerStopped = true;
+		timerJoueur -= cost;
+	}
+
+	public void FinishAttack()
+	{
+		isTimerStopped = false;
+	}
+	
     public void Update()
     {
-        if (isPlayerTurn)
+        if (isPlayerTurn && isTimerStopped == false)
         {
 			timerJoueur -= Time.deltaTime;
 
