@@ -27,7 +27,6 @@ public class ennemyBasic : MonoBehaviour
     {
 		if(isMoving == false && GameManager.singleton.getPlayerTurn() == false)
 		{
-			Debug.Log("Start coroutine");
 			timerMove = 0f;
 			StartCoroutine(Mouvement());
 		}
@@ -35,7 +34,6 @@ public class ennemyBasic : MonoBehaviour
 
 	IEnumerator Mouvement()
 	{
-		Debug.Log("Se déplace");
 		isMoving = true;
 		navMeshAgent.isStopped = false;
 		navMeshAgent.speed = 3;
@@ -47,8 +45,7 @@ public class ennemyBasic : MonoBehaviour
 		//Tant que je ne suis pas rendu à destination, je ne fait rien d'autre
 		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 0.5f && timerMove < 3f))
 		{
-			Debug.Log("Salut");
-			Debug.Log(timerMove);
+		
 			timerMove += Time.deltaTime;
 			yield return null;
 		}
