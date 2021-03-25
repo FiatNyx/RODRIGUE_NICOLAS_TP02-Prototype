@@ -21,7 +21,9 @@ public class player : MonoBehaviour
 	private Vector3 _direction;
 	Vector3 cible;
 
+	public GameObject fireball;
 	public GameObject marqueur1;
+	public Transform projectileStartPoint;
 
 	// Start is called before the first frame update
 	void Start()
@@ -136,8 +138,9 @@ public class player : MonoBehaviour
 				
 				if (transform.rotation == _lookRotation)
 				{
-					particles.transform.position = cible;
-					particles.Play();
+					//particles.transform.position = cible;
+					//particles.Play();
+					Instantiate(fireball, projectileStartPoint.position, projectileStartPoint.rotation);
 					GameManager.singleton.FinishAttack();
 					isRotating = false;
 					navMeshAgent.isStopped = false;
