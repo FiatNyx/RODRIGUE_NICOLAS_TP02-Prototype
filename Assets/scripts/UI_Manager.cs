@@ -27,17 +27,14 @@ public class UI_Manager : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void UpdateTimer(float timeRemaining)
     {
-        UpdateTimer();   
-    }
 
-    void UpdateTimer()
-    {
-        float time = GameManager.singleton.getTimerJoueur();
-        time = Mathf.Round(time * 10f) / 10f;
-        textTimer.text = time.ToString();
+        //float time = GameManager.singleton.getTimerJoueur();
+        timeRemaining = Mathf.Round(timeRemaining * 10f) / 10f;
+        textTimer.text = timeRemaining.ToString();
+        
+       
 
     }
 

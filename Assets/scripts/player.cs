@@ -25,6 +25,12 @@ public class player : MonoBehaviour
 	public GameObject marqueur1;
 	public Transform projectileStartPoint;
 
+	Vector3 moveDirection;
+	Rigidbody rb;
+
+	public Transform cameraPosition;
+
+
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -36,15 +42,91 @@ public class player : MonoBehaviour
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		animationJoueur = GetComponent<Animator>();
+		rb = GetComponent<Rigidbody>();
 	}
 
 	// Update is called once per frame
 	void Update()
     {
+		cameraPosition.position = transform.position;
+		
+
+
+		animationJoueur.SetBool("Idle", false);
+
 		if (GameManager.singleton.getPlayerTurn())
 		{
 			
-		
+
+            if (Input.GetMouseButton(2))
+            {
+				RotateCamera();
+            }
+            else
+            {
+				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
+
+				RaycastHit hit;
+
+				if (Physics.Raycast(camRay, out hit))
+				{
+					//Demander au pnj de s'y rendre
+					Vector3 lookDirection = hit.point;
+					lookDirection.y = transform.position.y;
+
+					Vector3 relativePos = lookDirection - transform.position;
+
+					// the second argument, upwards, defaults to Vector3.up
+					Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+					transform.rotation = rotation;
+				}
+			}
+			
+
+            if (Input.GetMouseButtonDown(1))
+            {
+				moveSelected = 0;
+				marqueur1.SetActive(false);
+			}
+
+			if (Input.GetKeyDown(KeyCode.Alpha1))
+			{
+				marqueur1.SetActive(true);
+				marqueur1.transform.position = transform.position;
+				moveSelected = 1;
+			
+			}
+			if(moveSelected == 0)
+            {
+				float inputVertical = Input.GetAxis("Vertical");
+
+				float inputHorizontal = Input.GetAxis("Horizontal");
+
+				animationJoueur.SetFloat("horizontal", inputHorizontal);
+				animationJoueur.SetFloat("vertical", inputVertical);
+
+				moveDirection = transform.forward * inputVertical + transform.right * inputHorizontal;
+            }
+            else
+            {
+				moveDirection = Vector3.zero;
+				animationJoueur.SetBool("Idle", true);
+
+
+				if (Input.GetMouseButtonDown(0))
+				{
+					if (moveSelected == 1 && GameManager.singleton.getTimerJoueur() > 2)
+					{
+						Instantiate(fireball, projectileStartPoint.position, projectileStartPoint.rotation);
+						GameManager.singleton.FinishAttack();
+					}
+				}
+			}
+            
+			
+
+
+            /*
 			if (Input.GetMouseButtonDown(0) && isRotating == false)
 			{
 				if (moveSelected == 0)
@@ -208,7 +290,39 @@ public class player : MonoBehaviour
 					marqueur1.transform.LookAt(cible);
 				}
 			}
+			*/
 
-		}
+
+        }
+        else
+        {
+			moveDirection = Vector3.zero;
+			animationJoueur.SetBool("Idle", true);
+        }
+	}
+
+
+    private void FixedUpdate()
+    {
+		rb.MovePosition(rb.position + moveDirection.normalized * 5 * Time.fixedDeltaTime);
+		
+
+		
+
+		//transform.LookAt(lookDirection);
+
+		//transform.Rotate(rotationDirection);
+	}
+
+
+	void RotateCamera()
+	{
+		Vector3 rotCamera = cameraPosition.rotation.eulerAngles;
+
+		// Le player tourne en fonction de la position de la souris (y seulement)
+		rotCamera.y += Input.GetAxis("Mouse X") * 10;
+
+		// Appliquer la rotation rotPlayer dans la rotation du Transform (Quaternion)
+		cameraPosition.rotation = Quaternion.Euler(rotCamera);
 	}
 }

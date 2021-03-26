@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 	public float tempsTourJoueur = 5f;
 	bool isTimerStopped = false;
 	float timerEnnemy = 0f;
+	float tempsTourEnnemy = 5f;
 
 	private void Awake()
 	{
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour
 		{
 			isPlayerTurn = false;
 			UI_Manager.singleton.changeTurnText(false);
+			timerEnnemy = tempsTourEnnemy;
 		}
 		else
 		{
@@ -68,11 +70,22 @@ public class GameManager : MonoBehaviour
         {
 			timerJoueur -= Time.deltaTime;
 
-			if(timerJoueur <= 0f)
+			UI_Manager.singleton.UpdateTimer(timerJoueur);
+			if (timerJoueur <= 0f)
             {
 				changeTurn();
             }
-        }
+        }else if(isPlayerTurn == false)
+        {
+			timerEnnemy -= Time.deltaTime;
+
+			UI_Manager.singleton.UpdateTimer(timerEnnemy);
+			if (timerEnnemy <= 0f)
+			{
+				changeTurn();
+			}
+
+		}
     }
 
 	public float getTimerJoueur()
