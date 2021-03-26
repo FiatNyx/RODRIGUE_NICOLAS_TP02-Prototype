@@ -9,6 +9,9 @@ public class ennemyBasic : MonoBehaviour
 	bool isMoving = false;
 	float timerMove = 0f;
 	public GameObject player;
+
+	int health = 15;
+
 	// Start is called before the first frame update
 	void Start()
     {
@@ -25,11 +28,19 @@ public class ennemyBasic : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if(isMoving == false && GameManager.singleton.getPlayerTurn() == false)
+		if (health <= 0)
+		{
+			Destroy(gameObject);
+			return;
+		}
+
+		if (isMoving == false && GameManager.singleton.getPlayerTurn() == false)
 		{
 			timerMove = 0f;
 			StartCoroutine(Mouvement());
 		}
+
+		
 	}
 
 	IEnumerator Mouvement()
@@ -60,5 +71,11 @@ public class ennemyBasic : MonoBehaviour
 		//Je démarre une nouvelle patrouille
 		GameManager.singleton.changeTurn();
 		isMoving = false;
+	}
+
+
+	public void dealDamage(int damage)
+	{
+		health -= damage;
 	}
 }

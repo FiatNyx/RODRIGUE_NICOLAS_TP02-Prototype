@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 	bool isPlayerTurn = true;
 	public float tempsTourJoueur = 5f;
 	bool isTimerStopped = false;
-
+	float timerEnnemy = 0f;
 
 	private void Awake()
 	{
