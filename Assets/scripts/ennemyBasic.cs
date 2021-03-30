@@ -11,7 +11,7 @@ public class ennemyBasic : MonoBehaviour
 	public GameObject player;
 
 	int health = 15;
-
+	private Animator animation;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -22,7 +22,7 @@ public class ennemyBasic : MonoBehaviour
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		timerMove = 0f;
-		
+		animation = GetComponent<Animator>();
 	}
 
 	// Update is called once per frame
@@ -45,9 +45,10 @@ public class ennemyBasic : MonoBehaviour
 
 	IEnumerator Mouvement()
 	{
+		animation.SetBool("Running", true);
 		isMoving = true;
 		navMeshAgent.isStopped = false;
-		navMeshAgent.speed = 3;
+		
 
 		//Me déplacer vers la destination
 		navMeshAgent.SetDestination(player.transform.position);
@@ -58,17 +59,17 @@ public class ennemyBasic : MonoBehaviour
 		{
 		
 			timerMove += Time.deltaTime;
+
 			yield return null;
 		}
-
-		print("Finis");
-		//Rendu à destination, je prend une pause (Bien méritée)
+		
 		if (navMeshAgent.remainingDistance > 0.5f)
 		{
 			navMeshAgent.isStopped = true;
+			
 		}
 
-		//Je démarre une nouvelle patrouille
+		animation.SetBool("Running", false);
 		GameManager.singleton.changeTurn();
 		isMoving = false;
 	}
