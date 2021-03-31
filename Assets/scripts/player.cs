@@ -95,6 +95,15 @@ public class player : MonoBehaviour
 				marqueur1.transform.position = transform.position;
 				moveSelected = 1;
 			
+			}else if (Input.GetKeyDown(KeyCode.Alpha2))
+			{
+
+			}else if (Input.GetKeyDown(KeyCode.Alpha3))
+			{
+
+			}else if (Input.GetKeyDown(KeyCode.Alpha4))
+			{
+				moveSelected = 4;
 			}
 			if(moveSelected == 0)
             {
@@ -117,8 +126,31 @@ public class player : MonoBehaviour
 				{
 					if (moveSelected == 1 && GameManager.singleton.getTimerJoueur() > 2)
 					{
+						GameManager.singleton.StartAttack(2);
 						Instantiate(fireball, projectileStartPoint.position, projectileStartPoint.rotation);
 						GameManager.singleton.FinishAttack();
+					}
+					else if(moveSelected == 2 && GameManager.singleton.getTimerJoueur() > 2)
+					{
+
+					}
+					else if(moveSelected == 3 && GameManager.singleton.getTimerJoueur() > 2)
+					{
+
+					}
+					else if(moveSelected == 4 && GameManager.singleton.getTimerJoueur() > 2)
+					{
+						Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
+
+						RaycastHit hit;
+
+						if (Physics.Raycast(camRay, out hit))
+						{
+							GameManager.singleton.StartAttack(2);
+							transform.position = hit.point;
+							//Particle system ici
+							GameManager.singleton.FinishAttack();
+						}
 					}
 				}
 			}

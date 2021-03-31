@@ -10,7 +10,7 @@ public class ennemyBasic : MonoBehaviour
 	float timerMove = 0f;
 	public GameObject player;
 
-	int health = 15;
+	int health = 50;
 	private Animator animation;
 	// Start is called before the first frame update
 	void Start()
@@ -74,9 +74,17 @@ public class ennemyBasic : MonoBehaviour
 		isMoving = false;
 	}
 
-
+	/* Vector3 toPlayer = player.transform.position - transform.position;
+ if (Vector3.Distance(player.transform.position - transform.position) < 3) {
+   Vector3 targetPosition = toPlayer.normalized * -3f;
+   navMeshAgent.destination = targetPosition;
+   navMeshAgent.Resume();
+ }
+ */
 	public void dealDamage(int damage)
 	{
 		health -= damage;
 	}
 }
+
+
