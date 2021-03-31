@@ -11,7 +11,7 @@ public class ennemyBasic : MonoBehaviour
 	public GameObject player;
 
 	int health = 50;
-	private Animator animation;
+	private Animator animationEnnemy;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -22,7 +22,7 @@ public class ennemyBasic : MonoBehaviour
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		timerMove = 0f;
-		animation = GetComponent<Animator>();
+		animationEnnemy = GetComponent<Animator>();
 	}
 
 	// Update is called once per frame
@@ -45,7 +45,7 @@ public class ennemyBasic : MonoBehaviour
 
 	IEnumerator Mouvement()
 	{
-		animation.SetBool("Running", true);
+		animationEnnemy.SetBool("Running", true);
 		isMoving = true;
 		navMeshAgent.isStopped = false;
 		
@@ -69,7 +69,7 @@ public class ennemyBasic : MonoBehaviour
 			
 		}
 
-		animation.SetBool("Running", false);
+		animationEnnemy.SetBool("Running", false);
 		GameManager.singleton.changeTurn();
 		isMoving = false;
 	}
