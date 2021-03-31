@@ -39,12 +39,14 @@ public class GameManager : MonoBehaviour
 			isPlayerTurn = false;
 			UI_Manager.singleton.changeTurnText(false);
 			timerEnnemy = tempsTourEnnemy;
+			isTimerStopped = false;
 		}
 		else
 		{
 			timerJoueur = tempsTourJoueur;
 			isPlayerTurn = true;
 			UI_Manager.singleton.changeTurnText(true);
+			isTimerStopped = false;
 		}
 	}
 
@@ -75,7 +77,7 @@ public class GameManager : MonoBehaviour
             {
 				changeTurn();
             }
-        }else if(isPlayerTurn == false)
+        }else if(isPlayerTurn == false && isTimerStopped == false)
         {
 			timerEnnemy -= Time.deltaTime;
 

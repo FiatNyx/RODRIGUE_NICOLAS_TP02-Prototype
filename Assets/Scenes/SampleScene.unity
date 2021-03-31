@@ -6527,10 +6527,10 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 7
-  m_Acceleration: 8
+  m_Acceleration: 15
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.85
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -6937,6 +6937,7 @@ MonoBehaviour:
     type: 3}
   marqueur1: {fileID: 1352815463}
   projectileStartPoint: {fileID: 1357195945}
+  isAttacking: 0
   cameraPosition: {fileID: 1237669903}
 --- !u!54 &1646873373
 Rigidbody:

@@ -7,6 +7,7 @@ public class ennemyBasic : MonoBehaviour
 {
 	NavMeshAgent navMeshAgent;
 	bool isMoving = false;
+	
 	float timerMove = 0f;
 	public GameObject player;
 
@@ -55,21 +56,45 @@ public class ennemyBasic : MonoBehaviour
 		
 
 		//Tant que je ne suis pas rendu à destination, je ne fait rien d'autre
-		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 0.5f && timerMove < 3f))
+		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 4f && timerMove < 3f))
 		{
 		
 			timerMove += Time.deltaTime;
 
 			yield return null;
 		}
-		
-		if (navMeshAgent.remainingDistance > 0.5f)
+
+		navMeshAgent.isStopped = true;
+		navMeshAgent.ResetPath();
+		animationEnnemy.SetBool("Running", false);
+
+		float timerAttack = 0f;
+		if (navMeshAgent.remainingDistance <= 4f)
 		{
-			navMeshAgent.isStopped = true;
+			GameManager.singleton.StartAttack(0);
+			while(timerAttack < 1f)
+			{
+				timerAttack += Time.deltaTime;
+				yield return null;
+			}
+
+			animationEnnemy.SetTrigger("Attack");
+			player.GetComponent<Animator>().SetTrigger("Hurt");
+			while (timerAttack < 3f)
+			{
+				
+				timerAttack += Time.deltaTime;
+				yield return null;
+			}
+			player.GetComponent<player>().vie -= 10;
+			
+			GameManager.singleton.FinishAttack();
 			
 		}
 
-		animationEnnemy.SetBool("Running", false);
+
+
+		
 		GameManager.singleton.changeTurn();
 		isMoving = false;
 	}

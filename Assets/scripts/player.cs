@@ -12,6 +12,7 @@ public class player : MonoBehaviour
 	Animator animationJoueur;
 	bool isRotating;
 
+	public int vie = 30;
 
 	Vector3 rotationTarget;
 	public float RotationSpeed;
@@ -48,6 +49,11 @@ public class player : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+
+		if(vie <= 0)
+		{
+			Destroy(gameObject);
+		}
 		cameraPosition.position = transform.position;
 		
 
