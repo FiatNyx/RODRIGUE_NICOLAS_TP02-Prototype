@@ -97,8 +97,7 @@ public class player : MonoBehaviour
             if (Input.GetMouseButtonDown(1))
             {
 				moveSelected = 0;
-				marqueur1.SetActive(false);
-				marqueur2.SetActive(false);
+				effacerMarqueurs();
 			}
 
 
@@ -106,12 +105,14 @@ public class player : MonoBehaviour
 
 			if (Input.GetKeyDown(KeyCode.Alpha1))
 			{
+				effacerMarqueurs();
 				marqueur1.SetActive(true);
 				marqueur1.transform.position = transform.position;
 				moveSelected = 1;
 			
 			}else if (Input.GetKeyDown(KeyCode.Alpha2))
 			{
+				effacerMarqueurs();
 				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
 
 				RaycastHit hit;
@@ -229,7 +230,11 @@ public class player : MonoBehaviour
         }
 	}
 
-
+	private void effacerMarqueurs()
+	{
+		marqueur1.SetActive(false);
+		marqueur2.SetActive(false);
+	}
     private void FixedUpdate()
     {
 		float speed = 5f;

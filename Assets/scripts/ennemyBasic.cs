@@ -62,7 +62,7 @@ public class ennemyBasic : MonoBehaviour
 		
 
 		//Tant que je ne suis pas rendu à destination, je ne fait rien d'autre
-		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 4f && timerMove < 3f))
+		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 1.5f && timerMove < 3f))
 		{
 		
 			timerMove += Time.deltaTime;
@@ -85,7 +85,7 @@ public class ennemyBasic : MonoBehaviour
 		animationEnnemy.SetBool("Running", false);
 
 		float timerAttack = 0f;
-		if (navMeshAgent.remainingDistance <= 4f)
+		if (navMeshAgent.remainingDistance <= 1.5f)
 		{
 			GameManager.singleton.StartAttack(0);
 			while(timerAttack < 1f)
