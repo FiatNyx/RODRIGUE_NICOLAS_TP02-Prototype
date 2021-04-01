@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 
 	float timerJoueur = 0f;
 	bool isPlayerTurn = true;
-	public float tempsTourJoueur = 5f;
+	public float tempsTourJoueur = 10f;
 	bool isTimerStopped = false;
 	float timerEnnemy = 0f;
 	float tempsTourEnnemy = 5f;

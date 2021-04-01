@@ -13,6 +13,11 @@ public class ennemyBasic : MonoBehaviour
 
 	int health = 50;
 	private Animator animationEnnemy;
+
+
+	bool isPoisoned;
+	float timerPoison = 0f;
+	float speed = 0f;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -24,6 +29,7 @@ public class ennemyBasic : MonoBehaviour
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		timerMove = 0f;
 		animationEnnemy = GetComponent<Animator>();
+		speed = navMeshAgent.speed;
 	}
 
 	// Update is called once per frame
@@ -61,6 +67,16 @@ public class ennemyBasic : MonoBehaviour
 		
 			timerMove += Time.deltaTime;
 
+			if (isPoisoned)
+			{
+				timerPoison += Time.deltaTime;
+
+				if (timerPoison > 0.3)
+				{
+					health -= 3;
+					timerPoison = 0;
+				}
+			}
 			yield return null;
 		}
 
@@ -79,7 +95,7 @@ public class ennemyBasic : MonoBehaviour
 			}
 
 			animationEnnemy.SetTrigger("Attack");
-			player.GetComponent<Animator>().SetTrigger("Hurt");
+			player.GetComponent<Animator>().SetTrigger("Hurt"); //Timer animation joueur avec l'attaque
 			while (timerAttack < 3f)
 			{
 				
@@ -110,6 +126,28 @@ public class ennemyBasic : MonoBehaviour
 	{
 		health -= damage;
 	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		
+		if (other.tag == "LentPoison")
+		{
+			
+			navMeshAgent.speed = speed / 2;
+			isPoisoned = true;
+		}
+	}
+
+	
+	private void OnTriggerExit(Collider other)
+	{
+		if (other.tag == "LentPoison")
+		{
+			navMeshAgent.speed = speed;
+			isPoisoned = false;
+		}
+	}
+
 }
 
 
