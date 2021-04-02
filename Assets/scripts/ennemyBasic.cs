@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class ennemyBasic : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class ennemyBasic : MonoBehaviour
 	float timerMove = 0f;
 	public GameObject player;
 
+	public int maxHealth = 50;
 	int health = 50;
 	private Animator animationEnnemy;
 
@@ -18,6 +20,10 @@ public class ennemyBasic : MonoBehaviour
 	bool isPoisoned;
 	float timerPoison = 0f;
 	float speed = 0f;
+	public bool isThisEnnemyTurn;
+	public Slider sliderVie;
+
+
 	// Start is called before the first frame update
 	void Start()
     {
@@ -30,6 +36,7 @@ public class ennemyBasic : MonoBehaviour
 		timerMove = 0f;
 		animationEnnemy = GetComponent<Animator>();
 		speed = navMeshAgent.speed;
+		health = maxHealth;
 	}
 
 	// Update is called once per frame
@@ -37,11 +44,12 @@ public class ennemyBasic : MonoBehaviour
     {
 		if (health <= 0)
 		{
+			GameManager.singleton.killEnnemy(transform);
 			Destroy(gameObject);
 			return;
 		}
 
-		if (isMoving == false && GameManager.singleton.getPlayerTurn() == false)
+		if (isMoving == false && GameManager.singleton.getPlayerTurn() == false && isThisEnnemyTurn)
 		{
 			timerMove = 0f;
 			StartCoroutine(Mouvement());
@@ -50,7 +58,7 @@ public class ennemyBasic : MonoBehaviour
 		
 	}
 
-	IEnumerator Mouvement()
+	IEnumerator Mouvement() //Changer mouvement pour les autres types d'ennemis, genre le mettre dans un autre component
 	{
 		animationEnnemy.SetBool("Running", true);
 		isMoving = true;
@@ -62,9 +70,9 @@ public class ennemyBasic : MonoBehaviour
 		
 
 		//Tant que je ne suis pas rendu à destination, je ne fait rien d'autre
-		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 1.5f && timerMove < 3f))
+		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 3f && timerMove < 3f))
 		{
-		
+			Debug.Log(navMeshAgent.remainingDistance);
 			timerMove += Time.deltaTime;
 
 			if (isPoisoned)
@@ -73,20 +81,22 @@ public class ennemyBasic : MonoBehaviour
 
 				if (timerPoison > 0.3)
 				{
-					health -= 3;
+					dealDamage(3);
 					timerPoison = 0;
 				}
 			}
 			yield return null;
 		}
 
-		navMeshAgent.isStopped = true;
-		navMeshAgent.ResetPath();
-		animationEnnemy.SetBool("Running", false);
+		
 
+		
 		float timerAttack = 0f;
-		if (navMeshAgent.remainingDistance <= 1.5f)
+		if (navMeshAgent.remainingDistance <= 3f)
 		{
+			navMeshAgent.isStopped = true;
+			navMeshAgent.ResetPath();
+			animationEnnemy.SetBool("Running", false);
 			GameManager.singleton.StartAttack(0);
 			while(timerAttack < 1f)
 			{
@@ -102,15 +112,17 @@ public class ennemyBasic : MonoBehaviour
 				timerAttack += Time.deltaTime;
 				yield return null;
 			}
-			player.GetComponent<player>().vie -= 10;
+			player.GetComponent<player>().damage(10);
 			
 			GameManager.singleton.FinishAttack();
 			
 		}
 
+		navMeshAgent.isStopped = true;
+		navMeshAgent.ResetPath();
+		animationEnnemy.SetBool("Running", false);
 
 
-		
 		GameManager.singleton.changeTurn();
 		isMoving = false;
 	}
@@ -125,6 +137,8 @@ public class ennemyBasic : MonoBehaviour
 	public void dealDamage(int damage)
 	{
 		health -= damage;
+		sliderVie.value = (float)health / (float)maxHealth * 100f;
+		print(health / maxHealth);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -138,7 +152,6 @@ public class ennemyBasic : MonoBehaviour
 		}
 	}
 
-	
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.tag == "LentPoison")

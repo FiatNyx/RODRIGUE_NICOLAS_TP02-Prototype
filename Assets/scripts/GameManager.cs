@@ -14,6 +14,10 @@ public class GameManager : MonoBehaviour
 	float timerEnnemy = 0f;
 	float tempsTourEnnemy = 5f;
 
+	List<Transform> listeEnnemis = new List<Transform>();
+	public GameObject conteneurEnnemi;
+	int indexEnnemy = 0;
+
 	private void Awake()
 	{
 		if (singleton != null)
@@ -29,7 +33,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
 		timerJoueur = tempsTourJoueur;
-    }
+		foreach (Transform child in conteneurEnnemi.transform)
+			listeEnnemis.Add(child);
+	}
 
 
     public void changeTurn()
@@ -41,12 +47,35 @@ public class GameManager : MonoBehaviour
 			timerEnnemy = tempsTourEnnemy;
 			isTimerStopped = false;
 		}
-		else
+		
+		if(isPlayerTurn == false)
 		{
-			timerJoueur = tempsTourJoueur;
-			isPlayerTurn = true;
-			UI_Manager.singleton.changeTurnText(true);
-			isTimerStopped = false;
+			if (indexEnnemy > 0)
+			{
+				if(listeEnnemis[indexEnnemy - 1] != null)
+				{
+					listeEnnemis[indexEnnemy - 1].GetComponent<ennemyBasic>().isThisEnnemyTurn = false;
+				}
+				
+			}
+
+			if (indexEnnemy >= listeEnnemis.Count)
+			{
+				timerJoueur = tempsTourJoueur;
+				isPlayerTurn = true;
+				UI_Manager.singleton.changeTurnText(true);
+				isTimerStopped = false;
+				indexEnnemy = 0;
+			}
+			else
+			{
+				timerEnnemy = tempsTourEnnemy;
+				
+
+				listeEnnemis[indexEnnemy].GetComponent<ennemyBasic>().isThisEnnemyTurn = true;
+				indexEnnemy += 1;
+			}
+			
 		}
 	}
 
@@ -94,4 +123,28 @@ public class GameManager : MonoBehaviour
     {
 		return timerJoueur;
     }
+
+	public void killEnnemy(Transform ennemy)
+	{
+		if (isPlayerTurn)
+		{
+			listeEnnemis.Remove(ennemy);
+		}
+		else
+		{
+			StartCoroutine(WaitForPlayerTurn(ennemy));
+		}
+		
+	}
+
+	IEnumerator WaitForPlayerTurn(Transform ennemy)
+	{
+		while(isPlayerTurn == false)
+		{
+			yield return null;
+		}
+
+		listeEnnemis.Remove(ennemy);
+
+	}
 }

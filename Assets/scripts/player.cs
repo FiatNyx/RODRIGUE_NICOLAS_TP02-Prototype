@@ -12,8 +12,8 @@ public class player : MonoBehaviour
 	Animator animationJoueur;
 	bool isRotating;
 
-	public int vie = 30;
-
+	int vie = 30;
+	public int vieMax = 30;
 	Vector3 rotationTarget;
 	public float RotationSpeed;
 
@@ -41,7 +41,7 @@ public class player : MonoBehaviour
 	void Start()
 	{
 		mainCam = Camera.main;
-
+		UI_Manager.singleton.changeVieText(vieMax, vie);
 	}
 
 	private void Awake()
@@ -49,6 +49,7 @@ public class player : MonoBehaviour
 		navMeshAgent = GetComponent<NavMeshAgent>();
 		animationJoueur = GetComponent<Animator>();
 		rb = GetComponent<Rigidbody>();
+		vie = vieMax;
 	}
 
 	// Update is called once per frame
@@ -109,6 +110,7 @@ public class player : MonoBehaviour
 				marqueur1.SetActive(true);
 				marqueur1.transform.position = transform.position;
 				moveSelected = 1;
+				UI_Manager.singleton.changeSelectedMove(0);
 			
 			}else if (Input.GetKeyDown(KeyCode.Alpha2))
 			{
@@ -123,13 +125,16 @@ public class player : MonoBehaviour
 					marqueur2.transform.position = hit.point;
 					moveSelected = 2;
 				}
+				UI_Manager.singleton.changeSelectedMove(1);
 			}
 			else if (Input.GetKeyDown(KeyCode.Alpha3))
 			{
-
-			}else if (Input.GetKeyDown(KeyCode.Alpha4))
+				UI_Manager.singleton.changeSelectedMove(2);
+			}
+			else if (Input.GetKeyDown(KeyCode.Alpha4))
 			{
 				moveSelected = 4;
+				UI_Manager.singleton.changeSelectedMove(3);
 			}
 
 
@@ -150,7 +155,7 @@ public class player : MonoBehaviour
 
 					if(timerPoison > 0.3)
 					{
-						vie -= 2;
+						damage(2);
 						timerPoison = 0;
 					}
 				}
@@ -230,6 +235,11 @@ public class player : MonoBehaviour
         }
 	}
 
+	public void damage(int damage)
+	{
+		vie -= damage;
+		UI_Manager.singleton.changeVieText(vieMax, vie);
+	}
 	private void effacerMarqueurs()
 	{
 		marqueur1.SetActive(false);

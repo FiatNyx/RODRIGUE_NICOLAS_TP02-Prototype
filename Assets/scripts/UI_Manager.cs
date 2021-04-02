@@ -6,28 +6,37 @@ public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager singleton;
     public Text textTour;
+	public Text textVie;
+	public List<RawImage> uiAttaques;
+	public List<RawImage> listeSelectedUI;
+	public Text textTimer;
 
-    private void Awake()
+
+	private void Awake()
     {
         if (singleton != null)
         {
             Debug.LogError("Détection de multiples instances du GameManager.");
             return;
         }
+		singleton = this;
+
+		
+
+
+
 
         // Assignation du singleton
-        singleton = this;
+       
     }
 
-    public Text textTimer;
+   
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    public void UpdateTimer(float timeRemaining)
+	private void Start()
+	{
+		float timerJoueur = GameManager.singleton.getTimerJoueur();
+	}
+	public void UpdateTimer(float timeRemaining)
     {
 
         //float time = GameManager.singleton.getTimerJoueur();
@@ -49,4 +58,20 @@ public class UI_Manager : MonoBehaviour
 			textTour.text = "Tour des ennemis";
 		}
     }
+
+	public void changeVieText(int vieMax, int vie)
+	{
+		textVie.text = "Vie : " + vie.ToString() + "/" + vieMax.ToString();
+	}
+
+
+	public void changeSelectedMove(int index)
+	{
+		foreach (RawImage image in listeSelectedUI)
+		{
+			image.enabled = false;
+		}
+
+		listeSelectedUI[index].enabled = true;
+	}
 }
