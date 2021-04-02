@@ -37,6 +37,12 @@ public class player : MonoBehaviour
 	bool isPoisoned = false;
 	float timerPoison = 0;
 
+	AudioSource audioSource;
+	public AudioClip audioDamage;
+	public AudioClip audioEclair;
+	public AudioClip audioZoom;
+	public AudioClip audioBoom;
+	
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -50,6 +56,7 @@ public class player : MonoBehaviour
 		animationJoueur = GetComponent<Animator>();
 		rb = GetComponent<Rigidbody>();
 		vie = vieMax;
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	// Update is called once per frame
@@ -97,8 +104,7 @@ public class player : MonoBehaviour
 
             if (Input.GetMouseButtonDown(1))
             {
-				moveSelected = 0;
-				effacerMarqueurs();
+				resetAttackSelected();
 			}
 
 
@@ -110,7 +116,7 @@ public class player : MonoBehaviour
 				marqueur1.SetActive(true);
 				marqueur1.transform.position = transform.position;
 				moveSelected = 1;
-				UI_Manager.singleton.changeSelectedMove(0);
+				UI_Manager.singleton.changeSelectedMove(1);
 			
 			}else if (Input.GetKeyDown(KeyCode.Alpha2))
 			{
@@ -125,16 +131,19 @@ public class player : MonoBehaviour
 					marqueur2.transform.position = hit.point;
 					moveSelected = 2;
 				}
-				UI_Manager.singleton.changeSelectedMove(1);
+				UI_Manager.singleton.changeSelectedMove(2);
 			}
 			else if (Input.GetKeyDown(KeyCode.Alpha3))
 			{
-				UI_Manager.singleton.changeSelectedMove(2);
+				moveSelected = 3;
+				UI_Manager.singleton.changeSelectedMove(3);
+				
 			}
 			else if (Input.GetKeyDown(KeyCode.Alpha4))
 			{
 				moveSelected = 4;
-				UI_Manager.singleton.changeSelectedMove(3);
+				UI_Manager.singleton.changeSelectedMove(4);
+				
 			}
 
 
@@ -153,9 +162,9 @@ public class player : MonoBehaviour
 				{
 					timerPoison += Time.deltaTime;
 
-					if(timerPoison > 0.3)
+					if(timerPoison > 0.5)
 					{
-						damage(2);
+						damage(3);
 						timerPoison = 0;
 					}
 				}
@@ -209,7 +218,7 @@ public class player : MonoBehaviour
 					}
 					else if(moveSelected == 3 && GameManager.singleton.getTimerJoueur() > 2)
 					{
-
+						audioSource.PlayOneShot(audioEclair);
 					}
 					else if(moveSelected == 4 && GameManager.singleton.getTimerJoueur() > 2)
 					{
@@ -223,22 +232,35 @@ public class player : MonoBehaviour
 							transform.position = hit.point;
 							//Particle system ici
 							GameManager.singleton.FinishAttack();
+							audioSource.PlayOneShot(audioZoom);
 						}
+
+					
 					}
 				}
 			}
         }
         else
         {
+			resetAttackSelected();
 			moveDirection = Vector3.zero;
 			animationJoueur.SetBool("Idle", true);
         }
 	}
 
+	void resetAttackSelected()
+	{
+		moveSelected = 0;
+		effacerMarqueurs();
+		UI_Manager.singleton.changeSelectedMove(0);
+	}
+
+
 	public void damage(int damage)
 	{
 		vie -= damage;
 		UI_Manager.singleton.changeVieText(vieMax, vie);
+		audioSource.PlayOneShot(audioDamage);
 	}
 	private void effacerMarqueurs()
 	{

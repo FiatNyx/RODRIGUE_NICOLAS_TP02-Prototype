@@ -21,14 +21,24 @@ public class ennemyBasic : MonoBehaviour
 	float timerPoison = 0f;
 	float speed = 0f;
 	public bool isThisEnnemyTurn;
-	public Slider sliderVie;
+	public GameObject sliderVie;
 
+	AudioSource audioSource;
+	public AudioClip audioOuch;
+	public AudioClip audioAttack;
+	public AudioClip audioMortEnnemy;
+	public Collider ennemyCollider;
+	
+	Rigidbody[] ragdollRBs;
+	Collider[] ragdollColliders;
 
 	// Start is called before the first frame update
 	void Start()
     {
-        
-    }
+		ragdollRBs = GetComponentsInChildren<Rigidbody>();
+		ragdollColliders = GetComponentsInChildren<Collider>();
+		audioSource = GetComponent<AudioSource>();
+	}
 
 	private void Awake()
 	{
@@ -42,16 +52,12 @@ public class ennemyBasic : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if (health <= 0)
-		{
-			GameManager.singleton.killEnnemy(transform);
-			Destroy(gameObject);
-			return;
-		}
+		
 
 		if (isMoving == false && GameManager.singleton.getPlayerTurn() == false && isThisEnnemyTurn)
 		{
 			timerMove = 0f;
+			
 			StartCoroutine(Mouvement());
 		}
 
@@ -79,9 +85,9 @@ public class ennemyBasic : MonoBehaviour
 			{
 				timerPoison += Time.deltaTime;
 
-				if (timerPoison > 0.3)
+				if (timerPoison > 0.8)
 				{
-					dealDamage(3);
+					dealDamage(8);
 					timerPoison = 0;
 				}
 			}
@@ -96,6 +102,7 @@ public class ennemyBasic : MonoBehaviour
 		{
 			navMeshAgent.isStopped = true;
 			navMeshAgent.ResetPath();
+			transform.LookAt(player.transform.position);
 			animationEnnemy.SetBool("Running", false);
 			GameManager.singleton.StartAttack(0);
 			while(timerAttack < 1f)
@@ -104,6 +111,7 @@ public class ennemyBasic : MonoBehaviour
 				yield return null;
 			}
 
+			audioSource.PlayOneShot(audioAttack);
 			animationEnnemy.SetTrigger("Attack");
 			player.GetComponent<Animator>().SetTrigger("Hurt"); //Timer animation joueur avec l'attaque
 			while (timerAttack < 3f)
@@ -137,8 +145,33 @@ public class ennemyBasic : MonoBehaviour
 	public void dealDamage(int damage)
 	{
 		health -= damage;
-		sliderVie.value = (float)health / (float)maxHealth * 100f;
-		print(health / maxHealth);
+		sliderVie.GetComponent<Slider>().value = (float)health / (float)maxHealth * 100f;
+
+		audioSource.PlayOneShot(audioOuch);
+		if (health <= 0)
+		{
+			
+			StopAllCoroutines();
+			audioSource.Stop();
+			audioSource.PlayOneShot(audioMortEnnemy);
+
+			animationEnnemy.enabled = false;
+			navMeshAgent.enabled = false;
+			ennemyCollider.enabled = false;
+			GameManager.singleton.killEnnemy(transform);
+			foreach (Collider rbcollider in ragdollColliders)
+			{
+				rbcollider.enabled = true;
+			}
+
+			foreach (Rigidbody rb in ragdollRBs)
+			{
+				rb.isKinematic = false;
+			}
+			sliderVie.SetActive(false);
+			this.enabled = false;
+
+		}
 	}
 
 	private void OnTriggerEnter(Collider other)

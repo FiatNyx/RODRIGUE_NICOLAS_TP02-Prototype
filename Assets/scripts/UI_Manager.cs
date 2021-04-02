@@ -67,11 +67,16 @@ public class UI_Manager : MonoBehaviour
 
 	public void changeSelectedMove(int index)
 	{
+
 		foreach (RawImage image in listeSelectedUI)
 		{
 			image.enabled = false;
 		}
 
-		listeSelectedUI[index].enabled = true;
+		if(index != 0)
+		{
+			listeSelectedUI[index - 1].enabled = true;
+		}
+		
 	}
 }
