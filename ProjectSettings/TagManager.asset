@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - LentPoison
+  - SpecialAttackP1
+  - attaqueJoueur
   layers:
   - Default
   - TransparentFX
