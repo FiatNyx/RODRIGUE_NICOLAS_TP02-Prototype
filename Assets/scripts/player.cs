@@ -48,13 +48,19 @@ public class player : MonoBehaviour
 	public AudioClip audioBoom;
 	
 	public ParticleSystem teleportParticles;
-	// Start is called before the first frame update
+	
+	/// <summary>
+	/// Initialisation de la variable de caméra et changement du texte de vie dans l'UI pour la vie du personnage
+	/// </summary>
 	void Start()
 	{
 		mainCam = Camera.main;
 		UI_Manager.singleton.changeVieText(vieMax, vie);
 	}
 
+	/// <summary>
+	/// Stock certains component dans des variables et initialise la vie selon la vie maximale
+	/// </summary>
 	private void Awake()
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
@@ -64,46 +70,50 @@ public class player : MonoBehaviour
 		audioSource = GetComponent<AudioSource>();
 	}
 
-	// Update is called once per frame
+	/// <summary>
+	/// S'occupe des attaques et de chaque action que le joueur peut faire avec ses inputs
+	/// </summary>
 	void Update()
     {
 
-	
+		//S'assure que la caméra suit le personnage
 		cameraPosition.position = transform.position;
-		
 
 
+		//Pour s'assurer que le personnage cours quand il se déplace
 		animationJoueur.SetBool("Idle", false);
 
+		//S'il s'agit du tour du personnage
 		if (GameManager.singleton.getPlayerTurn() && isAttacking == false)
 		{
 			
-
+			//Tourne la caméra. Ne peut pas rien tourner le personnage en même temps de tourner la caméra.
             if (Input.GetMouseButton(2))
             {
 				RotateCamera();
             }
             else
             {
+				//Tourner le personnage pour qu'il face face à la souris
 				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
 
 				RaycastHit hit;
 
 				if (Physics.Raycast(camRay, out hit))
 				{
-					//Demander au pnj de s'y rendre
+				
 					Vector3 lookDirection = hit.point;
 					lookDirection.y = transform.position.y;
 
 					Vector3 relativePos = lookDirection - transform.position;
 
-					// the second argument, upwards, defaults to Vector3.up
+				
 					Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
 					transform.rotation = rotation;
 				}
 			}
 			
-
+			//Clic droit pour annuler une attaque
             if (Input.GetMouseButtonDown(1))
             {
 				resetAttackSelected();
@@ -111,7 +121,9 @@ public class player : MonoBehaviour
 
 
 
-
+			//--------------------
+			//Sélection des attaques
+			//-------------------
 			if (Input.GetKeyDown(KeyCode.Alpha1))
 			{
 				effacerMarqueurs();
@@ -120,7 +132,8 @@ public class player : MonoBehaviour
 				moveSelected = 1;
 				UI_Manager.singleton.changeSelectedMove(1);
 			
-			}else if (Input.GetKeyDown(KeyCode.Alpha2))
+			}
+			else if (Input.GetKeyDown(KeyCode.Alpha2))
 			{
 				effacerMarqueurs();
 				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
@@ -166,7 +179,7 @@ public class player : MonoBehaviour
 
 
 
-
+			//Déplacement du personnage
 			if(moveSelected == 0)
             {
 				float inputVertical = Input.GetAxis("Vertical");
@@ -191,9 +204,10 @@ public class player : MonoBehaviour
 				moveDirection = transform.forward * inputVertical + transform.right * inputHorizontal;
 				
 				
-            }
+            }//Si une attaque a été sélectionnée
             else
             {
+				//S'assure que le personnage ne se déplace pas
 				moveDirection = Vector3.zero;
 				animationJoueur.SetBool("Idle", true);
 
@@ -204,6 +218,7 @@ public class player : MonoBehaviour
 
 				if (Physics.Raycast(camRay, out hit))
 				{
+					//S'occupe de la rotation de tous les marqueurs. Ainsi que leur position
 					projectileStartPoint.LookAt(hit.point);
 					marqueur1.transform.LookAt(hit.point);
 					marqueur3.transform.LookAt(hit.point);
@@ -219,7 +234,9 @@ public class player : MonoBehaviour
 
 				
 
-
+				//--------------------------------
+				//Section des attaques. Le getTimerJoueur() est pour s'assurer que le joueur ait assez de temps pour payer l'attaque
+				//---------------------------------
 				if (Input.GetMouseButtonDown(0))
 				{
 					if (moveSelected == 1 && GameManager.singleton.getTimerJoueur() > 2)
@@ -266,6 +283,7 @@ public class player : MonoBehaviour
 				}
 			}
         }
+		//S'il s'agit du tour de l'ennemi, s'assure que le personnage ne peut plus bouger ou attaquer, mais permet de tourner la caméra
         else
         {
 			resetAttackSelected();
@@ -279,6 +297,9 @@ public class player : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Efface tous les marqueurs et remet l'attaque sélectionnée à rien
+	/// </summary>
 	void resetAttackSelected()
 	{
 		moveSelected = 0;
@@ -286,7 +307,10 @@ public class player : MonoBehaviour
 		UI_Manager.singleton.changeSelectedMove(0);
 	}
 
-
+	/// <summary>
+	/// Endommage le personnage et reload la scène s'il est tué
+	/// </summary>
+	/// <param name="damage"></param>
 	public void damage(int damage)
 	{
 		vie -= damage;
@@ -301,6 +325,9 @@ public class player : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Efface les marqueurs
+	/// </summary>
 	private void effacerMarqueurs()
 	{
 		marqueur1.SetActive(false);
@@ -309,6 +336,9 @@ public class player : MonoBehaviour
 		marqueur4.SetActive(false);
 	}
 
+	/// <summary>
+	/// Déplace le personnage
+	/// </summary>
     private void FixedUpdate()
     {
 		float speed = 5f;
@@ -320,6 +350,10 @@ public class player : MonoBehaviour
 		rb.MovePosition(rb.position + moveDirection.normalized * speed * Time.fixedDeltaTime);
 	}
 
+	/// <summary>
+	/// Détecte si le personnage est dans une zone de poison/ralentissement
+	/// </summary>
+	/// <param name="other"></param>
 	private void OnTriggerEnter(Collider other)
 	{
 		if(other.tag == "LentPoison")
@@ -329,6 +363,10 @@ public class player : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Détecte si le personnage est sortit d'une zone de poison/ralentissement
+	/// </summary>
+	/// <param name="other"></param>
 	private void OnTriggerExit(Collider other)
 	{
 		if (other.tag == "LentPoison")
@@ -338,17 +376,24 @@ public class player : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Permet de tourner la caméra
+	/// </summary>
 	void RotateCamera()
 	{
 		Vector3 rotCamera = cameraPosition.rotation.eulerAngles;
 
-		// Le player tourne en fonction de la position de la souris (y seulement)
+		
 		rotCamera.y += Input.GetAxis("Mouse X") * 10;
 
-		// Appliquer la rotation rotPlayer dans la rotation du Transform (Quaternion)
+		
 		cameraPosition.rotation = Quaternion.Euler(rotCamera);
 	}
 
+	/// <summary>
+	/// S'occupe du lancement de l'attaque de boule de feu
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator BouleDeFeu()
 	{
 		GameManager.singleton.StartAttack(2);
@@ -376,7 +421,10 @@ public class player : MonoBehaviour
 		GameManager.singleton.FinishAttack();
 	}
 
-
+	/// <summary>
+	/// S'occupe du lancement de l'attaque d'éclair
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator Eclair()
 	{
 

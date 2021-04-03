@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+/// <summary>
+/// La classe pour faire tourner les particules de la téléportation
+/// </summary>
 public class TeleportParticles : MonoBehaviour
 {
 	bool isSpinning;
 	float timerSpin = 0f;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
-    // Update is called once per frame
-    void Update()
+
+	/// <summary>
+	///  Fait tourner les particules si le isSpinning est activé
+	/// </summary>
+	void Update()
     {
 		if (isSpinning)
 		{
@@ -26,6 +29,10 @@ public class TeleportParticles : MonoBehaviour
 		}   
     }
 
+
+	/// <summary>
+	/// Active la rotation des particules
+	/// </summary>
 	public void Spin()
 	{
 		isSpinning = true;

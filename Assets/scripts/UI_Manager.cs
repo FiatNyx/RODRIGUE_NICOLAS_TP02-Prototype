@@ -6,12 +6,15 @@ public class UI_Manager : MonoBehaviour
 {
     public static UI_Manager singleton;
     public Text textTour;
+	public Text textTimer;
 	public Text textVie;
 	public List<RawImage> uiAttaques;
 	public List<RawImage> listeSelectedUI;
-	public Text textTimer;
+	
 
-
+	/// <summary>
+	/// Assignation du singleton s'il n'en a pas déjà un.
+	/// </summary>
 	private void Awake()
     {
         if (singleton != null)
@@ -20,33 +23,24 @@ public class UI_Manager : MonoBehaviour
             return;
         }
 		singleton = this;
-
-		
-
-
-
-
-        // Assignation du singleton
-       
     }
 
-   
 
-	private void Start()
-	{
-		float timerJoueur = GameManager.singleton.getTimerJoueur();
-	}
+
+	/// <summary>
+	/// Reçoit le temps restant et l'affiche dans l'UI
+	/// </summary>
+	/// <param name="timeRemaining">Le temps restant au tour actuel.</param>
 	public void UpdateTimer(float timeRemaining)
     {
-
-        //float time = GameManager.singleton.getTimerJoueur();
         timeRemaining = Mathf.Round(timeRemaining * 10f) / 10f;
         textTimer.text = timeRemaining.ToString();
-        
-       
-
     }
 
+	/// <summary>
+	/// Change à qui appartient le tour dans l'UI
+	/// </summary>
+	/// <param name="isTurnJoueur">True s'il s'agit du tour du joueur, false s'il s'agit du tour des ennemis</param>
     public void changeTurnText(bool isTurnJoueur)
     {
 		if(isTurnJoueur)
@@ -59,20 +53,29 @@ public class UI_Manager : MonoBehaviour
 		}
     }
 
+	/// <summary>
+	/// Met à jour la vie du joueur dans l'UI
+	/// </summary>
+	/// <param name="vieMax">La vie maximale du personnage</param>
+	/// <param name="vie">La vie actuelle du personnage</param>
 	public void changeVieText(int vieMax, int vie)
 	{
 		textVie.text = "Vie : " + vie.ToString() + "/" + vieMax.ToString();
 	}
 
-
+	/// <summary>
+	/// Affiche un contour jaune sur la compétence actuellement sélectionnée
+	/// </summary>
+	/// <param name="index">L'index de la compétence, 0 = aucune compétence</param>
 	public void changeSelectedMove(int index)
 	{
-
+		//Déselectionner les autres compétences dans l'UI
 		foreach (RawImage image in listeSelectedUI)
 		{
 			image.enabled = false;
 		}
 
+		
 		if(index != 0)
 		{
 			listeSelectedUI[index - 1].enabled = true;

@@ -9,7 +9,10 @@ public class Fireball : MonoBehaviour
 
 	public GameObject explosion;
 	float timerDestruction = 0;
-    // Start is called before the first frame update
+
+	/// <summary>
+	/// Initialisation de certaines variables
+	/// </summary>
     void Start()
     {
 		rb = GetComponent<Rigidbody>();
@@ -17,6 +20,10 @@ public class Fireball : MonoBehaviour
 		
     }
 
+	/// <summary>
+	/// Déplace la boule de feu et la détruit après un certain temps et avertit le joueur que l'attaque est finie.
+	/// Instancie une explosion quand la boule de feu est détruite.
+	/// </summary>
 	private void FixedUpdate()
 	{
 		rb.MovePosition(transform.position + transform.forward * Time.deltaTime * 10);
@@ -30,6 +37,12 @@ public class Fireball : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Détecte si la boule de feu est entrée en collision. 
+	/// Si l'autre objet est un ennemi, lui applique des dégats.
+	/// Instancie une explosion et détruit la boule de feu.
+	/// </summary>
+	/// <param name="collision">La collision, ce qui permet d'accéder à l'autre objet de la collision</param>
 	private void OnCollisionEnter(Collision collision)
 	{
 		if(collision.collider.GetComponent<ennemyBasic>() != null)
@@ -37,6 +50,7 @@ public class Fireball : MonoBehaviour
 			collision.collider.GetComponent<ennemyBasic>().dealDamage(10);
 			
 		}
+
 		GameObject explosionInstance = Instantiate(explosion, transform.position, transform.rotation);
 		
 		explosionInstance.GetComponent<Explosion>().joueur = joueur;

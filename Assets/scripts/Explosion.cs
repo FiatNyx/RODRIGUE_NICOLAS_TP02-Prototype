@@ -7,7 +7,9 @@ public class Explosion : MonoBehaviour
 	float timerDestruction = 0;
 	public player joueur;
 
-	// Start is called before the first frame update
+	/// <summary>
+	/// Applique une explosion initiale qui affecte les rigidbodys
+	/// </summary>
 	void Start()
 	{
 		Collider[] colliders = Physics.OverlapSphere(transform.position, 10);
@@ -22,7 +24,10 @@ public class Explosion : MonoBehaviour
 			}
 		}
 	}
-    // Update is called once per frame
+   
+	/// <summary>
+	/// Détruit l'explosion après un certain temps et avertit le joueur que l'attaque est finie.
+	/// </summary>
     void Update()
     {
 		timerDestruction += Time.deltaTime;
