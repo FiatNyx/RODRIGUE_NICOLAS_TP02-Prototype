@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class player : MonoBehaviour
 {
@@ -15,7 +16,7 @@ public class player : MonoBehaviour
 	int vie = 30;
 	public int vieMax = 30;
 	Vector3 rotationTarget;
-	public float RotationSpeed;
+
 
 	//values for internal use
 	private Quaternion _lookRotation;
@@ -25,6 +26,9 @@ public class player : MonoBehaviour
 	public GameObject fireball;
 	public GameObject marqueur1;
 	public GameObject marqueur2;
+	public GameObject marqueur3;
+	public GameObject marqueur4;
+
 	public Transform projectileStartPoint;
 	public bool isAttacking = false;
 	Vector3 moveDirection;
@@ -36,13 +40,14 @@ public class player : MonoBehaviour
 	bool isSlowed = false;
 	bool isPoisoned = false;
 	float timerPoison = 0;
-
+	public GameObject eclair;
 	AudioSource audioSource;
 	public AudioClip audioDamage;
 	public AudioClip audioEclair;
 	public AudioClip audioZoom;
 	public AudioClip audioBoom;
 	
+	public ParticleSystem teleportParticles;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -63,10 +68,7 @@ public class player : MonoBehaviour
 	void Update()
     {
 
-		if(vie <= 0)
-		{
-			Destroy(gameObject);
-		}
+	
 		cameraPosition.position = transform.position;
 		
 
@@ -129,18 +131,34 @@ public class player : MonoBehaviour
 				{
 					marqueur2.SetActive(true);
 					marqueur2.transform.position = hit.point;
-					moveSelected = 2;
+					
 				}
+				moveSelected = 2;
 				UI_Manager.singleton.changeSelectedMove(2);
 			}
 			else if (Input.GetKeyDown(KeyCode.Alpha3))
 			{
+				effacerMarqueurs();
+				marqueur3.SetActive(true);
+				marqueur3.transform.position = transform.position;
 				moveSelected = 3;
 				UI_Manager.singleton.changeSelectedMove(3);
 				
 			}
 			else if (Input.GetKeyDown(KeyCode.Alpha4))
 			{
+				effacerMarqueurs();
+				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
+
+				RaycastHit hit;
+
+				if (Physics.Raycast(camRay, out hit))
+				{
+					marqueur4.SetActive(true);
+					marqueur4.transform.position = hit.point;
+					
+				}
+
 				moveSelected = 4;
 				UI_Manager.singleton.changeSelectedMove(4);
 				
@@ -179,19 +197,27 @@ public class player : MonoBehaviour
 				moveDirection = Vector3.zero;
 				animationJoueur.SetBool("Idle", true);
 
-				if(moveSelected == 2)
+
+				Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
+
+				RaycastHit hit;
+
+				if (Physics.Raycast(camRay, out hit))
 				{
-					Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
-
-					RaycastHit hit;
-
-					if (Physics.Raycast(camRay, out hit))
+					projectileStartPoint.LookAt(hit.point);
+					marqueur1.transform.LookAt(hit.point);
+					marqueur3.transform.LookAt(hit.point);
+					if (moveSelected == 2)
 					{
-						
 						marqueur2.transform.position = hit.point;
-					
+					}
+					else if(moveSelected == 4)
+					{
+						marqueur4.transform.position = hit.point;
 					}
 				}
+
+				
 
 
 				if (Input.GetMouseButtonDown(0))
@@ -199,38 +225,38 @@ public class player : MonoBehaviour
 					if (moveSelected == 1 && GameManager.singleton.getTimerJoueur() > 2)
 					{
 						isAttacking = true;
+						animationJoueur.SetTrigger("FireballAttack");
 						StartCoroutine(BouleDeFeu());
 						
 					}
-					else if(moveSelected == 2 && GameManager.singleton.getTimerJoueur() > 2)
+					else if(moveSelected == 2 && GameManager.singleton.getTimerJoueur() > 4)
 					{
-						Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
-
-						RaycastHit hit;
+						
 
 						if (Physics.Raycast(camRay, out hit))
 						{
-							GameManager.singleton.StartAttack(2);
+							GameManager.singleton.StartAttack(4);
 							GameObject cercleLent = Instantiate(cercleLentPrefab, hit.point, transform.rotation);
-							//Particle system ici
+							
 							GameManager.singleton.FinishAttack();
 						}
 					}
-					else if(moveSelected == 3 && GameManager.singleton.getTimerJoueur() > 2)
+					else if(moveSelected == 3 && GameManager.singleton.getTimerJoueur() > 3)
 					{
+						isAttacking = true;
+						animationJoueur.SetTrigger("LightningAttack");
+						StartCoroutine(Eclair());
 						audioSource.PlayOneShot(audioEclair);
 					}
-					else if(moveSelected == 4 && GameManager.singleton.getTimerJoueur() > 2)
+					else if(moveSelected == 4 && GameManager.singleton.getTimerJoueur() > 6)
 					{
-						Ray camRay = mainCam.ScreenPointToRay(Input.mousePosition);
-
-						RaycastHit hit;
-
+					
 						if (Physics.Raycast(camRay, out hit))
 						{
-							GameManager.singleton.StartAttack(2);
+							GameManager.singleton.StartAttack(6);
 							transform.position = hit.point;
-							//Particle system ici
+							teleportParticles.Play();
+							teleportParticles.GetComponent<TeleportParticles>().Spin();
 							GameManager.singleton.FinishAttack();
 							audioSource.PlayOneShot(audioZoom);
 						}
@@ -245,7 +271,12 @@ public class player : MonoBehaviour
 			resetAttackSelected();
 			moveDirection = Vector3.zero;
 			animationJoueur.SetBool("Idle", true);
-        }
+
+			if (Input.GetMouseButton(2))
+			{
+				RotateCamera();
+			}
+		}
 	}
 
 	void resetAttackSelected()
@@ -259,14 +290,25 @@ public class player : MonoBehaviour
 	public void damage(int damage)
 	{
 		vie -= damage;
+		
 		UI_Manager.singleton.changeVieText(vieMax, vie);
 		audioSource.PlayOneShot(audioDamage);
+
+		if (vie <= 0)
+		{
+			Scene scene = SceneManager.GetActiveScene();
+			SceneManager.LoadScene(scene.name);
+		}
 	}
+
 	private void effacerMarqueurs()
 	{
 		marqueur1.SetActive(false);
 		marqueur2.SetActive(false);
+		marqueur3.SetActive(false);
+		marqueur4.SetActive(false);
 	}
+
     private void FixedUpdate()
     {
 		float speed = 5f;
@@ -310,10 +352,46 @@ public class player : MonoBehaviour
 	IEnumerator BouleDeFeu()
 	{
 		GameManager.singleton.StartAttack(2);
+
+		float timerMove = 0;
+		while (isAttacking && timerMove < 1.5f)
+		{
+			timerMove += Time.deltaTime;
+			yield return null;
+		}
+
+		
+		
 		GameObject bouleDeFeu = Instantiate(fireball, projectileStartPoint.position, projectileStartPoint.rotation);
 		bouleDeFeu.GetComponent<Fireball>().joueur = this;
 
+		timerMove = 0;
+		while (isAttacking && timerMove < 2)
+		{
+			timerMove += Time.deltaTime;
+			yield return null;
+		}
+
+		isAttacking = false;
+		GameManager.singleton.FinishAttack();
+	}
+
+
+	IEnumerator Eclair()
+	{
+
 		float timerMove = 0;
+		GameManager.singleton.StartAttack(3);
+
+		while (isAttacking && timerMove < 1)
+		{
+			timerMove += Time.deltaTime;
+			yield return null;
+		}
+		GameObject eclairInstance = Instantiate(eclair, projectileStartPoint.position, projectileStartPoint.rotation);
+		eclairInstance.GetComponent<Eclair>().joueur = this;
+
+		timerMove = 0;
 		while (isAttacking && timerMove < 2)
 		{
 			timerMove += Time.deltaTime;

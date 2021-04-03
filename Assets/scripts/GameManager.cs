@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
 	public float tempsTourJoueur = 10f;
 	bool isTimerStopped = false;
 	float timerEnnemy = 0f;
-	float tempsTourEnnemy = 5f;
+	float tempsTourEnnemy = 3f;
 
 	List<Transform> listeEnnemis = new List<Transform>();
 	public GameObject conteneurEnnemi;
@@ -123,7 +123,10 @@ public class GameManager : MonoBehaviour
     {
 		return timerJoueur;
     }
-
+	public float getTimerEnnemy()
+	{
+		return timerEnnemy;
+	}
 	public void killEnnemy(Transform ennemy)
 	{
 		if (isPlayerTurn)

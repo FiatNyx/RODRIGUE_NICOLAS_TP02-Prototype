@@ -8,8 +8,7 @@ public class ennemyBasic : MonoBehaviour
 {
 	NavMeshAgent navMeshAgent;
 	bool isMoving = false;
-	
-	float timerMove = 0f;
+
 	public GameObject player;
 
 	public int maxHealth = 50;
@@ -43,7 +42,7 @@ public class ennemyBasic : MonoBehaviour
 	private void Awake()
 	{
 		navMeshAgent = GetComponent<NavMeshAgent>();
-		timerMove = 0f;
+	
 		animationEnnemy = GetComponent<Animator>();
 		speed = navMeshAgent.speed;
 		health = maxHealth;
@@ -56,7 +55,7 @@ public class ennemyBasic : MonoBehaviour
 
 		if (isMoving == false && GameManager.singleton.getPlayerTurn() == false && isThisEnnemyTurn)
 		{
-			timerMove = 0f;
+			
 			
 			StartCoroutine(Mouvement());
 		}
@@ -76,10 +75,10 @@ public class ennemyBasic : MonoBehaviour
 		
 
 		//Tant que je ne suis pas rendu à destination, je ne fait rien d'autre
-		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 3f && timerMove < 3f))
+		while (navMeshAgent.pathPending || (navMeshAgent.remainingDistance > 3f && GameManager.singleton.getTimerEnnemy() > 0.2f))
 		{
 			Debug.Log(navMeshAgent.remainingDistance);
-			timerMove += Time.deltaTime;
+		
 
 			if (isPoisoned)
 			{
@@ -98,7 +97,7 @@ public class ennemyBasic : MonoBehaviour
 
 		
 		float timerAttack = 0f;
-		if (navMeshAgent.remainingDistance <= 3f)
+		if (Vector3.Distance(player.transform.position, transform.position) <= 3)
 		{
 			navMeshAgent.isStopped = true;
 			navMeshAgent.ResetPath();
@@ -182,6 +181,10 @@ public class ennemyBasic : MonoBehaviour
 			
 			navMeshAgent.speed = speed / 2;
 			isPoisoned = true;
+		}
+		if(other.tag == "attaqueJoueur")
+		{
+			dealDamage(other.GetComponent<PlayerAttaque>().damage);
 		}
 	}
 

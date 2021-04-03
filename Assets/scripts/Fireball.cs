@@ -6,8 +6,8 @@ public class Fireball : MonoBehaviour
 {
 	Rigidbody rb;
 	public player joueur;
-	
 
+	public GameObject explosion;
 	float timerDestruction = 0;
     // Start is called before the first frame update
     void Start()
@@ -23,7 +23,9 @@ public class Fireball : MonoBehaviour
 		timerDestruction += Time.deltaTime;
 		if(timerDestruction > 2)
 		{
-			joueur.isAttacking = false;
+			GameObject explosionInstance = Instantiate(explosion, transform.position, transform.rotation);
+			explosionInstance.GetComponent<Explosion>().joueur = joueur;
+			
 			Destroy(gameObject);
 		}
 	}
@@ -32,11 +34,12 @@ public class Fireball : MonoBehaviour
 	{
 		if(collision.collider.GetComponent<ennemyBasic>() != null)
 		{
-			collision.collider.GetComponent<ennemyBasic>().dealDamage(15);
+			collision.collider.GetComponent<ennemyBasic>().dealDamage(10);
 			
 		}
-
-		joueur.isAttacking = false;
+		GameObject explosionInstance = Instantiate(explosion, transform.position, transform.rotation);
+		
+		explosionInstance.GetComponent<Explosion>().joueur = joueur;
 		Destroy(gameObject);
 	}
 }
